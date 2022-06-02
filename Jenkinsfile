@@ -1,6 +1,8 @@
 pipeline {
-    agent { label 'JDK11' }
-    triggers { pollSCM('0 * * * *') }
+    agent { label 'JDK8' }
+    triggers { 
+        cron('0 * * * *') 
+        }
     stages {
         stage ('SourceCode') {
             steps {
@@ -10,13 +12,13 @@ pipeline {
         stage ('Build the code and sonarqube analysis') {
             steps {
                 withSonarQubeEnv ('SONAR_LATEST') {
-                    sh 'mvn clean package'
+                    sh script: "mvn package sonar:sonar"
                 }
             }
         }
-        stage ('Archive and Test Results') {
+        stage ('Reporting') {
             steps {
-               junit '**/surefire-reports/*.xml'
+               junit testResults: 'target/surefire-reports/*.xml'
             }
         }    
     }
