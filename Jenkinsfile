@@ -1,22 +1,24 @@
 pipeline {
-    agent any
+    agent { label 'JDK11' }
     triggers { pollSCM('0 * * * *') }
     stages {
-        stage('SourceCode') {
+        stage ('SourceCode') {
             steps {
                 git branch: 'main', url: 'https://github.com/Aparna-Puvvadi/spring-petclinic.git'
             }
         }
-        stage('Build') {
+        stage ('Build the code and sonarqube analysis') {
             steps {
-                sh 'mvn clean package'
+                withSonarQubeEnv ('SONAR_LATEST') {
+                    sh 'mvn clean package'
+                }
             }
         }
-        stage('Archive and Test Results') {
+        stage ('Archive and Test Results') {
             steps {
                junit '**/surefire-reports/*.xml'
-               archiveArtifacts artifacts: '**/*.war', followSymlinks: false
             }
-        }
+        }    
     }
 }
+
