@@ -1,8 +1,8 @@
 pipeline {
     agent { label 'JDK8' }
-    triggers { 
-        cron('0 * * * *') 
-        }
+    // triggers { 
+    //     cron('0 * * * *') 
+    //     }
     stages {
         stage ('SourceCode') {
             steps {
@@ -16,11 +16,7 @@ pipeline {
                 }
             }
         }
-        stage ('Reporting') {
-            steps {
-               junit testResults: 'target/surefire-reports/*.xml'
-            }
-        }    
+        
     }
 }
 
