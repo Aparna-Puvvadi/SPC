@@ -1,5 +1,5 @@
 pipeline {
-    agent { label 'JDK8' }
+    agent { label 'JDK11' }
     // triggers { 
     //     cron('0 * * * *') 
     //     }
