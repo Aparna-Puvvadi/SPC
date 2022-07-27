@@ -1,22 +1,33 @@
-pipeline {
-    agent { label 'JDK11' }
-    // triggers { 
-    //     cron('0 * * * *') 
-    //     }
-    stages {
-        stage ('SourceCode') {
-            steps {
-                git branch: 'main', credentialsId: '06ed9883-6839-494a-8a24-2bff76a3cdbe', url: 'https://github.com/Aparna-Puvvadi/spring-petclinic.git'
+pipeline{
+    agent any
+    stages{
+        stage ('source code') {
+            steps{
+                git branch: 'main', credentialsId: 'GIT', url: 'https://github.com/Aparna-Puvvadi/SPC.git'
             }
         }
-        stage ('Build the code and sonarqube analysis') {
-            steps {
-                withSonarQubeEnv ('SONAR_LATEST') {
-                    sh script: "mvn package sonar:sonar"
-                }
+        stage ('build') {
+            steps{
+                 sh 'mvn clean package'
             }
         }
-        
+        stage ('build docker image') {
+            steps{
+              withCredentials([string(credentialsId: 'DOCKER_CREDENTIALS', variable: 'DOCKER_HUB_CREDENTIALS')]) {
+                sh "docker login -u aparnapuvvadi -p ${DOCKER_HUB_CREDENTIALS}"
+             }
+                sh "docker push aparnapuvvadi/myspc"
+            }
+        }
+        // stage ('Deploy application in K8s') {
+        //     steps{
+        //         kubernetesDeploy(
+        //             configs: 'spc_deploy.yml',
+        //             kubeconfijId: 'K8S_CLUSTER_CONFIG',
+        //             enableConfigSubstitution: true
+        //         )
+
+        //     }
+        // }
     }
 }
-
